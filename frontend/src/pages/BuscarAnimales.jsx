@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import apiFetch from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import Navbar from '../components/Navbar.jsx';
 
 const CLASES = ['Mamífero', 'Ave', 'Reptil', 'Anfibio', 'Pez', 'Insecto'];
@@ -7,6 +10,10 @@ const DIETAS = ['Carnívoro', 'Herbívoro', 'Omnívoro'];
 const CONTINENTES = ['África', 'América', 'Oceanía', 'Asia', 'Europa', 'Antártida'];
 
 export default function BuscarAnimales() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Filter fields
   // Filtros
   const [nombre, setNombre] = useState('');
   const [clase, setClase] = useState('');
@@ -21,10 +28,25 @@ export default function BuscarAnimales() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const buildQuery = () => {
+    const params = new URLSearchParams();
+    if (nombre) params.append('nombre', nombre);
+    if (clase) params.append('clase', clase);
+    if (dieta) params.append('dieta', dieta);
+    if (continente) params.append('continente', continente);
+    if (pesoMin) params.append('pesoMin', pesoMin);
+    if (pesoMax) params.append('pesoMax', pesoMax);
+    if (enPeligro) params.append('enPeligro', 'true');
+    return params.toString();
+  };
+
+  const fetchAnimals = async () => {
   const fetchAnimals = useCallback(async (filters = {}) => {
     setLoading(true);
     setError(null);
     try {
+      const query = buildQuery();
+      const endpoint = query ? `/animales?${query}` : '/animales';
       const params = new URLSearchParams();
 
       const n = filters.nombre !== undefined ? filters.nombre : nombre;
@@ -52,11 +74,20 @@ export default function BuscarAnimales() {
     } finally {
       setLoading(false);
     }
+  };
   }, [nombre, clase, dieta, continente, pesoMin, pesoMax, enPeligro]);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  // Fetch all animals on first render
   // Cargar todos los animales al montar
   useEffect(() => {
     fetchAnimals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = (e) => {
@@ -93,9 +124,28 @@ export default function BuscarAnimales() {
     enPeligro;
 
   return (
+    <div style={{ padding: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Buscar Animales</h2>
+        <button onClick={handleLogout}>Cerrar sesión</button>
+      </div>
     <div className="app-layout">
       <Navbar />
 
+      <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem' }}>
+          <input placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <input placeholder="Clase" value={clase} onChange={(e) => setClase(e.target.value)} />
+          <input placeholder="Dieta" value={dieta} onChange={(e) => setDieta(e.target.value)} />
+          <input placeholder="Continente" value={continente} onChange={(e) => setContinente(e.target.value)} />
+          <input placeholder="Peso mínimo" type="number" value={pesoMin} onChange={(e) => setPesoMin(e.target.value)} />
+          <input placeholder="Peso máximo" type="number" value={pesoMax} onChange={(e) => setPesoMax(e.target.value)} />
+          <label>
+            <input type="checkbox" checked={enPeligro} onChange={(e) => setEnPeligro(e.target.checked)} /> En peligro
+          </label>
+        </div>
+        <button type="submit" style={{ marginTop: '0.5rem' }}>Buscar</button>
+      </form>
       <main className="main-content">
         <section className="search-section card">
           <div className="section-header">
@@ -105,6 +155,8 @@ export default function BuscarAnimales() {
             </p>
           </div>
 
+      {loading && <p>Cargando...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
           <form onSubmit={handleSubmit} className="filters-form">
             <div className="form-grid">
               {/* Filtro de Texto: Nombre */}
@@ -119,6 +171,31 @@ export default function BuscarAnimales() {
                 />
               </div>
 
+      <table border="1" cellPadding="5" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Clase</th>
+            <th>Dieta</th>
+            <th>Continente</th>
+            <th>Peso (kg)</th>
+            <th>En Peligro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {results.length === 0 && !loading && <tr><td colSpan="6">No se encontraron animales.</td></tr>}
+          {results.map((a, idx) => (
+            <tr key={idx}>
+              <td>{a.nombre}</td>
+              <td>{a.clase}</td>
+              <td>{a.dieta}</td>
+              <td>{a.continente}</td>
+              <td>{a.peso}</td>
+              <td>{a.enPeligro ? 'Sí' : 'No'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
               {/* Select: Clase */}
               <div className="form-group">
                 <label htmlFor="filter-clase">Clase</label>
@@ -317,3 +394,4 @@ export default function BuscarAnimales() {
     </div>
   );
 }
+

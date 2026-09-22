@@ -7,17 +7,17 @@ Aplicación full-stack interactiva con autenticación de usuarios (registro y lo
 ## 🛠️ Tecnologías y Arquitectura
 
 * **Backend:**
-  * Node.js & Express
-  * Autenticación con JSON Web Tokens (JWT) y cifrado de contraseñas con `bcryptjs`
-  * CORS habilitado para comunicación segura con el cliente
-  * Suite de tests de integración automatizados con `supertest` y `node:test` (Node.js 22+)
+  * **Runtime & Framework:** Node.js & Express
+  * **Seguridad & Auth:** JSON Web Tokens (JWT) y cifrado unidireccional de contraseñas con `bcryptjs`
+  * **CORS:** Configurado para comunicación segura con el cliente React
+  * **Testing:** Suite de tests de integración con `supertest` y el ejecutor nativo `node:test` (Node.js 22+)
 * **Frontend:**
-  * React 18 + Vite (SPA rápida y optimizada)
-  * React Router v6 con rutas protegidas (`<ProtectedRoute>`)
-  * Context API (`AuthContext`) para gestión centralizada de sesión y persistencia en `localStorage`
-  * CSS puro moderno con variables de diseño, diseño responsive (desktop y mobile), feedback de carga con spinner y estados vacíos
+  * **Core:** React 18 + Vite (SPA rápida con recarga en caliente HMR)
+  * **Enrutamiento:** React Router v6 con rutas protegidas (`<ProtectedRoute>`)
+  * **Estado Global:** Context API (`AuthContext`) para gestión centralizada de sesión y persistencia en `localStorage`
+  * **Estilos:** CSS puro moderno con variables de diseño, diseño responsive (desktop y mobile), feedback de carga con spinner y estados vacíos
 * **Persistencia:**
-  * Base de datos en archivos JSON locales (`database/animals.json` y `database/users.json`), con inicialización automática en runtime y lecturas/escrituras atómicas.
+  * Base de datos en archivos JSON locales (`database/animals.json` y `database/users.json`), con inicialización automática en runtime y lecturas/escrituras atómicas seguras.
 
 ---
 
@@ -25,11 +25,12 @@ Aplicación full-stack interactiva con autenticación de usuarios (registro y lo
 
 ```text
 /buscador-animales-challenge
-  ├── README.md                     <-- Documentación principal
-  ├── package.json                  <-- Scripts de conveniencia globales
+  ├── README.md                     <-- Documentación general del proyecto
+  ├── package.json                  <-- Scripts de conveniencia en la raíz
   ├── .gitignore                    <-- Exclusión de dependencias, builds y variables
   ├── /docs
-  │     └── consigna_Customswatch.md<-- Consigna original del challenge
+  │     ├── consigna_Customswatch.md<-- Consigna original del challenge
+  │     └── roadmap_mejoras.md      <-- Especificación técnica de mejoras futuras
   ├── /backend
   │     ├── /database
   │     │     ├── animals.json      <-- Dataset provisto de fauna
@@ -77,40 +78,40 @@ Aplicación full-stack interactiva con autenticación de usuarios (registro y lo
 ## 🚀 Guía de Instalación y Ejecución
 
 ### Requisitos previos
-* Node.js v18 o superior (recomendado v20+)
-* npm v9 o superior
+* **Node.js** v18 o superior (recomendado v20+)
+* **npm** v9 o superior
 
-### Opción A: Ejecución Rápida desde la Raíz
+### Opción A: Ejecución Rápida desde la Raíz (Recomendada)
 
-1. **Instalar todas las dependencias (backend y frontend):**
+1. **Instalar dependencias de backend y frontend:**
    ```bash
    npm run install:all
    ```
 
-2. **Iniciar el Backend:**
+2. **Iniciar el Backend (en una terminal):**
    ```bash
    npm run backend
    ```
-   *(Disponible en `http://localhost:3000`)*
+   *Disponible en `http://localhost:3000`*
 
 3. **Iniciar el Frontend (en otra terminal):**
    ```bash
    npm run frontend
    ```
-   *(Disponible en `http://localhost:5173`)*
+   *Disponible en `http://localhost:5173`*
 
 ---
 
 ### Opción B: Ejecución Manual Tradicional
 
-#### 1. Levantar Backend
+#### Backend
 ```bash
 cd backend
 npm install
 npm run dev
 ```
 
-#### 2. Levantar Frontend
+#### Frontend
 ```bash
 cd frontend
 npm install
@@ -126,39 +127,37 @@ El proyecto cuenta con una suite completa de **16 tests de integración automati
 ```bash
 npm test
 ```
-o desde el backend:
-```bash
-cd backend && npm test
-```
+*(O desde la carpeta `backend`: `cd backend && npm test`)*
 
-### Cobertura de los tests:
-* `GET /health`: Estado del servidor.
+### Cobertura de la Suite:
+* `GET /health`: Verificación de salud del servidor.
 * `POST /api/auth/signup`:
   * Validación de formato de email (400).
-  * Validación de longitud de contraseña $\ge 6$ caracteres (400).
+  * Validación de contraseña mínima de 6 caracteres (400).
   * Registro exitoso con hash bcrypt (201).
   * Rechazo de emails duplicados (400).
 * `POST /api/auth/login`:
-  * Rechazo por credenciales inexistentes con mensaje genérico (401).
-  * Rechazo por contraseña errónea con mensaje genérico (401).
+  * Rechazo por usuario inexistente con mensaje genérico (401).
+  * Rechazo por contraseña incorrecta con mensaje genérico (401).
   * Login exitoso con entrega de token JWT (200).
 * `GET /api/animales`:
   * Rechazo sin token de autorización (401).
   * Rechazo con token inválido/manipulado (401).
   * Obtención completa de catálogo con token válido (200).
-  * Filtro por búsqueda parcial de nombre común.
-  * Filtro exacto por clase.
-  * Filtro exacto por dieta.
-  * Filtro numérico por rango de peso (`pesoMin` y `pesoMax`).
+  * Filtro por búsqueda parcial de nombre común (`nombre`).
+  * Filtro exacto por clase (`clase`).
+  * Filtro exacto por dieta (`dieta`).
+  * Filtro por rango numérico de peso (`pesoMin` y `pesoMax`).
   * Filtro por estado de peligro de extinción (`enPeligro=true`).
 
 ---
 
 ## 📋 Documentación de la API
 
-### Autenticación (`/api/auth`)
+### 1. Autenticación (`/api/auth`)
 
 #### `POST /api/auth/signup`
+Registra un nuevo usuario en `database/users.json`.
 * **Body:**
   ```json
   {
@@ -172,6 +171,7 @@ cd backend && npm test
   ```
 
 #### `POST /api/auth/login`
+Autentica un usuario existente y genera un JWT.
 * **Body:**
   ```json
   {
@@ -184,28 +184,26 @@ cd backend && npm test
   {
     "message": "Login exitoso.",
     "token": "eyJhbGciOiJIUzI1NiIsIn...",
-    "user": {
-      "id": 1726960000000,
-      "email": "usuario@ejemplo.com"
-    }
+    "user": { "id": 1726960000000, "email": "usuario@ejemplo.com" }
   }
   ```
 
 ---
 
-### Catálogo de Animales (`/api/animales`)
+### 2. Catálogo de Animales (`/api/animales`)
 
-#### `GET /api/animales` *(Requiere autenticación)*
+#### `GET /api/animales` *(Ruta Protegida)*
+Devuelve los animales filtrados según los parámetros de consulta.
 * **Headers:** `Authorization: Bearer <TOKEN_JWT>`
-* **Query Params soportados (todos opcionales y combinables):**
-  * `nombre` *(string)*: Búsqueda parcial insensible a mayúsculas/minúsculas sobre `nombreComun`.
-  * `clase` *(string)*: Filtro exacto (`Mamífero`, `Ave`, `Reptil`, `Anfibio`, `Pez`, `Insecto`).
-  * `dieta` *(string)*: Filtro exacto (`Carnívoro`, `Herbívoro`, `Omnívoro`).
-  * `continente` *(string)*: Filtro exacto (`África`, `América`, `Oceanía`, `Asia`, `Europa`, `Antártida`).
-  * `pesoMin` *(number)*: Peso mínimo en kg.
-  * `pesoMax` *(number)*: Peso máximo en kg.
+* **Query Params Disponibles (Opcionales y combinables entre sí):**
+  * `nombre` *(string)*: Búsqueda parcial e insensible a mayúsculas sobre `nombreComun`.
+  * `clase` *(string)*: Coincidencia exacta (`Mamífero`, `Ave`, `Reptil`, `Anfibio`, `Pez`, `Insecto`).
+  * `dieta` *(string)*: Coincidencia exacta (`Carnívoro`, `Herbívoro`, `Omnívoro`).
+  * `continente` *(string)*: Coincidencia exacta (`África`, `América`, `Oceanía`, `Asia`, `Europa`, `Antártida`).
+  * `pesoMin` *(number)*: Filtro de peso promedio $\ge$ valor.
+  * `pesoMax` *(number)*: Filtro de peso promedio $\le$ valor.
   * `enPeligro` *(string)*: `'true'` o `'false'`.
-* **Ejemplo:**
+* **Ejemplo de consulta cURL:**
   ```bash
   curl -X GET "http://localhost:3000/api/animales?continente=África&enPeligro=true&pesoMin=100" \
     -H "Authorization: Bearer <TOKEN_JWT>"
@@ -216,15 +214,28 @@ cd backend && npm test
 ## 💡 Decisiones Técnicas y Criterios de Diseño
 
 1. **Seguridad en Autenticación:**
-   * Las contraseñas se hashean utilizando `bcryptjs` con salt rounds de 10. Nunca se almacenan ni viajan en texto plano.
-   * Los tokens JWT tienen tiempo de expiración (2 horas) y firman la identidad del usuario.
-   * En el login, las respuestas de credenciales incorrectas responden con un mensaje genérico `401 ("Credenciales inválidas.")` para evitar enumeración de cuentas.
+   * Las contraseñas se hashean utilizando `bcryptjs` con 10 rondas de salt antes de persistirlas.
+   * Los tokens JWT firman la identidad del usuario y tienen tiempo de expiración (2 horas).
+   * En el login, tanto el error de usuario inexistente como el de contraseña errónea responden con un mensaje genérico `401 ("Credenciales inválidas.")` para prevenir ataques de enumeración de cuentas.
 
 2. **Persistencia Atómica y Resiliente:**
-   * `db.js` implementa un helper `ensureDbExists()` que garantiza la creación del directorio `/database` y los archivos iniciales `users.json` sin romper la ejecución si se despliega en un entorno limpio.
+   * La utilidad `db.js` implementa `ensureDbExists()` que garantiza la creación del directorio `/database` y los archivos iniciales `users.json` sin romper la ejecución en entornos de despliegue limpios.
+   * La escritura se realiza en formato JSON indentado para mantener la legibilidad y trazabilidad de los datos.
 
-3. **Experiencia de Usuario en Frontend:**
-   * Formularios validados en tiempo real.
-   * Dropdowns (`<select>`) pre-poblados con las categorías exactas del dominio biológico.
-   * Tabla responsive completa con nombres comunes y científicos, tags para dietas y hábitats, y badges visuales para destacar especies en peligro de extinción.
-   * Botón de reseteo rápido de filtros y contador dinámico de resultados.
+3. **Experiencia de Usuario (Frontend):**
+   * **Dropdowns semánticos:** Se reemplazaron inputs de texto libre por `<select>` pre-poblados con las categorías reales del dataset (`clase`, `dieta`, `continente`).
+   * **Mapeo completo de atributos:** La tabla expone todos los campos relevantes (nombres científicos, esperanza de vida, hábitats y badges visuales para especies en peligro).
+   * **Navegación e Interacción:** Enlaces cruzados entre Login y Registro, navbar con información del usuario conectado, botón de reseteo rápido de filtros y contador dinámico de coincidencias.
+
+---
+
+## 🔮 Roadmap y Futuras Mejoras (Backlog Técnico)
+
+Para ver el diseño y especificación técnica detallada de futuras mejoras, consultar [docs/roadmap_mejoras.md](file:///c:/Users/santi/Proyectos/buscador-animales-challenge/docs/roadmap_mejoras.md):
+
+1. **📊 Exportación a CSV / Excel:** Descarga instantánea de los resultados filtrados para análisis aduanero/ecológico.
+2. **↕️ Ordenamiento interactivo de columnas:** Sort ascendente y descendente por peso, nombre y esperanza de vida.
+3. **🔍 Ficha Técnica / Modal de Detalle:** Vista expandida de cada animal con datos bio-geográficos y taxonomía.
+4. **⚡ Búsqueda Reactiva con Debounce:** Filtrado en tiempo real mientras el usuario escribe (300ms debounce).
+5. **🗄️ Persistencia Dual con Base de Datos Real (SQLite):** Adaptador de base de datos configurable vía `.env` (`DB_DRIVER=json` o `DB_DRIVER=sqlite`).
+6. **🤖 CI/CD con GitHub Actions:** Pipeline automatizado para ejecutar tests y validaciones de build en cada push o pull request.
