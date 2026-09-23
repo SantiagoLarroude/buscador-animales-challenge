@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { getUsers, saveUsers } = require('../utils/db');
+const { getUsers, createUser } = require('../utils/db');
 const { JWT_SECRET } = require('../middlewares/auth.middleware');
 
 // Regex simple para validar email
@@ -11,20 +11,22 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 async function signup(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
     // 1. Validaciones básicas
-    if (!email || !EMAIL_REGEX.test(email)) {
+    if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
       return res.status(400).json({ message: 'Proporcione un email con formato válido.' });
     }
 
-    if (!password || password.length < 6) {
+    if (typeof password !== 'string' || password.length < 6) {
       return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres.' });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     // 2. Verificar que el email no esté registrado
     const users = await getUsers();
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
     if (existingUser) {
       return res.status(400).json({ message: 'El email ya se encuentra registrado.' });
@@ -35,14 +37,10 @@ async function signup(req, res) {
     const passwordHash = await bcrypt.hash(password, salt);
 
     // 4. Crear y persistir nuevo usuario
-    const newUser = {
-      id: Date.now(),
-      email: email.toLowerCase(),
-      passwordHash,
-    };
-
-    users.push(newUser);
-    await saveUsers(users);
+    const newUser = await createUser({ email: normalizedEmail, passwordHash });
+    if (!newUser) {
+      return res.status(400).json({ message: 'El email ya se encuentra registrado.' });
+    }
 
     return res.status(201).json({ message: 'Usuario registrado correctamente.' });
   } catch (error) {
@@ -56,14 +54,14 @@ async function signup(req, res) {
  */
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
       return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
     const users = await getUsers();
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
 
     // Si el usuario no existe, devolvemos 401 genérico
     if (!user) {

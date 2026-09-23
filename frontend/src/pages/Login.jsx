@@ -16,6 +16,9 @@ export default function Login() {
   const registeredMessage = location.state?.registered
     ? '¡Cuenta creada con éxito! Ahora podés iniciar sesión.'
     : null;
+  const sessionMessage = location.state?.sessionExpired
+    ? 'Tu sesión venció o dejó de ser válida. Iniciá sesión nuevamente.'
+    : null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,13 +50,15 @@ export default function Login() {
           <h2>Iniciar Sesión</h2>
           <p>Ingresá con tus credenciales para acceder al buscador</p>
         </div>
-        {registeredMessage && (
-          <div className="alert alert-success">{registeredMessage}</div>
+        {(registeredMessage || sessionMessage) && (
+          <div className="alert alert-success" role="status">
+            {registeredMessage || sessionMessage}
+          </div>
         )}
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && <div className="alert alert-error" role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" aria-busy={loading}>
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
             <input
@@ -62,6 +67,7 @@ export default function Login() {
               placeholder="ejemplo@correo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
@@ -74,6 +80,7 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               required
             />
           </div>

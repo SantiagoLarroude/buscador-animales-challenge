@@ -34,9 +34,9 @@ export default function Signup() {
           <h2>Crear Cuenta</h2>
           <p>Registrate para acceder al catálogo de animales</p>
         </div>
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && <div className="alert alert-error" role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" aria-busy={loading}>
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
             <input
@@ -45,6 +45,7 @@ export default function Signup() {
               placeholder="ejemplo@correo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
@@ -57,6 +58,7 @@ export default function Signup() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
               required
               minLength={6}
             />

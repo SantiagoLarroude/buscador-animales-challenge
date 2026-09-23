@@ -4,6 +4,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    css: true,
+  },
   server: {
     // Vite dev server runs on 5173 by default, proxy API to backend
     proxy: {
@@ -15,4 +20,3 @@ export default defineConfig({
     },
   },
 });
-
