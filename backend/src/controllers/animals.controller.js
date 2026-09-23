@@ -47,7 +47,6 @@ async function getFilteredAnimals(req, res) {
     }
 
     // Filtro por estado de peligro de extinción
-    if (enPeligro !== undefined) {
     if (enPeligro !== undefined && enPeligro !== '') {
       const isEnPeligro = enPeligro === 'true';
       animals = animals.filter(a => a.enPeligroExtincion === isEnPeligro);
