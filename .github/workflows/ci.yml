@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Node ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['20.19.0', '22.x']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend
+        run: npm ci --prefix backend
+
+      - name: Install frontend
+        run: npm ci --prefix frontend
+
+      - name: Backend tests
+        run: npm run test:backend
+
+      - name: Frontend tests
+        run: npm run test:frontend
+
+      - name: Frontend production build
+        run: npm run build
+
+      - name: Dependency audit
+        run: npm run audit
