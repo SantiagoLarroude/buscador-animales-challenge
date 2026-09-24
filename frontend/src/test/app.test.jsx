@@ -128,6 +128,22 @@ describe('buscador protegido', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Servicio temporalmente no disponible');
   });
 
+  test('permite recorrer los filtros con el teclado en orden lógico', async () => {
+    storeSession();
+    fetch.mockResolvedValue(response(animals));
+    const user = userEvent.setup();
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    screen.getByLabelText(/nombre común/i).focus();
+    await user.tab();
+    expect(screen.getByLabelText(/^clase$/i)).toHaveFocus();
+    await user.tab();
+    expect(screen.getByLabelText(/^dieta$/i)).toHaveFocus();
+    await user.tab();
+    expect(screen.getByLabelText(/^continente$/i)).toHaveFocus();
+  });
+
   test('arma filtros, los limpia y valida rangos antes de llamar a la API', async () => {
     storeSession();
     fetch.mockResolvedValue(response(animals));
