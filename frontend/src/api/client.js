@@ -24,10 +24,15 @@ export default async function apiFetch(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (error) {
+    throw new ApiError('No se pudo conectar con el servidor. Verificá tu conexión e intentá nuevamente.', 0);
+  }
 
   const responseText = await response.text();
   let data = null;

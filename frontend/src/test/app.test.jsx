@@ -99,6 +99,35 @@ describe('sesión y autenticación', () => {
 });
 
 describe('buscador protegido', () => {
+  test('anuncia el estado de carga mientras espera el catálogo', async () => {
+    storeSession();
+    fetch.mockImplementation(() => new Promise(() => {}));
+    renderApp('/animales');
+
+    expect(await screen.findByRole('status')).toHaveTextContent(/consultando base de datos/i);
+    expect(screen.getByRole('button', { name: /buscando/i })).toBeDisabled();
+  });
+
+  test('muestra un error accesible cuando la red no está disponible', async () => {
+    storeSession();
+    fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+    renderApp('/animales');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no se pudo conectar con el servidor/i);
+  });
+
+  test('maneja una respuesta de error que no contiene JSON', async () => {
+    storeSession();
+    fetch.mockResolvedValue({
+      ok: false,
+      status: 502,
+      text: async () => 'Servicio temporalmente no disponible',
+    });
+    renderApp('/animales');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Servicio temporalmente no disponible');
+  });
+
   test('arma filtros, los limpia y valida rangos antes de llamar a la API', async () => {
     storeSession();
     fetch.mockResolvedValue(response(animals));
