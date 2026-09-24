@@ -135,7 +135,7 @@ npm run check
 npm run audit
 ```
 
-El detalle de cada escenario, fecha, entorno, evidencia y estado está en [docs/casos-de-uso-verificados.md](docs/casos-de-uso-verificados.md). El workflow está definido en [`.github/workflows/ci.yml`](.github/workflows/ci.yml); el estado remoto debe comprobarse en la pestaña **Actions** del repositorio privado.
+El detalle de cada escenario, fecha, entorno, evidencia y estado está en [docs/casos-de-uso-verificados.md](docs/casos-de-uso-verificados.md). El workflow está definido en [`.github/workflows/ci.yml`](.github/workflows/ci.yml) y fue verificado en verde sobre Node 20.19 y 22 en el repositorio privado.
 
 Limitaciones deliberadas:
 

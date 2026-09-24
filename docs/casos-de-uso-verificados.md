@@ -10,7 +10,7 @@ Esta matriz registra resultados ejecutados sobre la versión funcional `9388bbe`
 | Suite final local | 2026-09-24 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | `9388bbe` | 29 backend + 14 frontend y build aprobados |
 | Auditoría | 2026-09-24 | Windows 11 x64 | npm audit | `9388bbe` | 0 backend; 2 moderadas frontend; 0 altas/críticas |
 | UAT visual | 2026-09-23 | Chrome, Windows 11 x64 | Desktop y viewport 390×844 | `9388bbe` (código de UI sin cambios desde UAT) | Flujo principal, orden, responsive y logout aprobados |
-| CI remoto | Pendiente de publicación | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | — | No aprobar hasta observar ambas variantes verdes |
+| CI remoto | 2026-09-24 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `256018a` | [Run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937) aprobado |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -56,7 +56,7 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | QA-01 Instalación limpia | Servidores detenidos; lockfiles presentes | `npm run install:all` | Ambos `npm ci` completan | Registro de ejecución; manual/terminal | Aprobado |
 | QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 14 frontend + Vite build | Salida de suite final; automática | Aprobado |
 | QA-03 Auditoría | Acceso a registry npm | `npm run audit` | Sin vulnerabilidades altas/críticas | 0 backend; 2 moderadas RR; automática | Aprobado con riesgo aceptado |
-| QA-04 CI Node 20/22 | Repositorio publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | GitHub Actions | Pendiente |
+| QA-04 CI Node 20/22 | Repositorio privado publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937); automática | Aprobado |
 
 ## Riesgo aceptado de dependencias
 
