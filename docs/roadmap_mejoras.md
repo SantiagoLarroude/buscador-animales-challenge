@@ -2,6 +2,19 @@
 
 Este documento detalla el diseño de arquitectura y la guía paso a paso para implementar las mejoras y pluses propuestos para el **Buscador de Animales**, orientados a un estándar de calidad senior y adaptados a las necesidades analíticas de **CustomsWatch**.
 
+## Estado al cierre de la entrega
+
+| Mejora | Estado | Evidencia |
+| --- | --- | --- |
+| Exportación CSV | Implementada | BOM UTF-8, encabezados en español, escape seguro y tests |
+| Ordenamiento por columnas | Implementado | Cinco columnas, ambas direcciones y atributos accesibles |
+| Ficha/modal de detalle | Pendiente | Mejora futura fuera del alcance de cierre |
+| Búsqueda reactiva con debounce | Pendiente | Se conserva el envío explícito para una demo predecible |
+| Persistencia SQLite | Pendiente | JSON sigue alineado con la consigna y simplifica la instalación |
+| CI con GitHub Actions | Implementada | Matriz Node 20.19/22, tests, build y audit high/critical |
+
+La implementación real prevalece sobre los fragmentos orientativos de este roadmap. Los resultados ejecutados están en [casos-de-uso-verificados.md](casos-de-uso-verificados.md).
+
 ---
 
 ## Índice de Mejoras Propuestas
