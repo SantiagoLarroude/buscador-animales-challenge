@@ -7,10 +7,11 @@ Challenge fullstack de CustomsWatch para registrar usuarios, iniciar sesión y c
 - Registro y login con contraseñas hasheadas y sesiones JWT de 2 horas.
 - Ruta del buscador protegida; cierre de sesión y recuperación ante tokens ausentes, inválidos o vencidos.
 - Catálogo de 30 animales con filtros por nombre, clase, dieta, continente, rango de peso y peligro de extinción.
+- Estado de filtros explícito: aplicar sólo se habilita ante cambios pendientes y limpiar recupera inmediatamente el catálogo completo.
 - Validación consistente en frontend y API, incluidos rangos y booleanos estrictos.
-- Ordenamiento accesible ascendente/descendente por especie, clase, dieta, peso y esperanza de vida.
+- Ordenamiento accesible ascendente/descendente por especie, clase, dieta, peso y esperanza de vida, con indicadores visibles y columna activa destacada.
 - Exportación del subconjunto visible a CSV UTF-8 y a un archivo Excel `.xlsx` con encabezados, tipos y acentos preservados.
-- Estados de carga, error y resultado vacío; navegación por teclado y diseño responsive.
+- Estados de carga, error y resultado vacío; chips pastel por categoría, navegación por teclado y diseño responsive.
 - Tests de integración backend y tests de componentes/utilidades frontend.
 - CI en Node 20 y 22 con instalación limpia, tests, build y auditoría de vulnerabilidades altas/críticas.
 
@@ -94,7 +95,7 @@ Los archivos `.env` no se versionan. Los `.env.example` contienen sólo valores 
 | `npm run backend` | Inicia Express con recarga |
 | `npm run frontend` | Inicia Vite |
 | `npm run test:backend` | Ejecuta 29 tests de integración backend |
-| `npm run test:frontend` | Ejecuta 14 tests frontend |
+| `npm run test:frontend` | Ejecuta 25 tests frontend |
 | `npm test` | Ejecuta ambas suites |
 | `npm run build` | Genera el build de producción del frontend |
 | `npm run audit` | Falla ante vulnerabilidades altas o críticas |

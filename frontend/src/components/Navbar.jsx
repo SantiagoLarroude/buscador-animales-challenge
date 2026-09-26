@@ -23,7 +23,7 @@ export default function Navbar() {
               👤 {user.email}
             </span>
           )}
-          <button onClick={handleLogout} className="btn btn-outline btn-sm">
+          <button onClick={handleLogout} className="btn btn-danger-soft btn-sm">
             Cerrar Sesión
           </button>
         </div>
@@ -31,4 +31,3 @@ export default function Navbar() {
     </header>
   );
 }
-

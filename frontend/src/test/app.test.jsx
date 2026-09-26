@@ -116,6 +116,18 @@ describe('buscador protegido', () => {
 
     expect(await screen.findByRole('status')).toHaveTextContent(/consultando base de datos/i);
     expect(screen.getByRole('button', { name: /buscando/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /limpiar filtros/i })).toBeDisabled();
+  });
+
+  test('aplica las clases visuales de las acciones principales', async () => {
+    storeSession();
+    fetch.mockResolvedValue(response(animals));
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    expect(screen.getByRole('button', { name: /cerrar sesión/i })).toHaveClass('btn-danger-soft');
+    expect(screen.getByRole('button', { name: /exportar csv/i })).toHaveClass('btn-export-csv');
+    expect(screen.getByRole('button', { name: /exportar excel/i })).toHaveClass('btn-export-excel');
   });
 
   test('muestra un error accesible cuando la red no está disponible', async () => {
@@ -161,24 +173,53 @@ describe('buscador protegido', () => {
     renderApp('/animales');
 
     await screen.findByText('León');
+    const applyButton = screen.getByRole('button', { name: /aplicar filtros/i });
+    const clearButton = screen.getByRole('button', { name: /limpiar filtros/i });
+    expect(applyButton).toBeDisabled();
+    expect(clearButton).toBeDisabled();
+
     await user.type(screen.getByLabelText(/nombre común/i), 'águila');
     await user.selectOptions(screen.getByLabelText(/^clase$/i), 'Ave');
-    await user.click(screen.getByRole('button', { name: /aplicar filtros/i }));
+    expect(applyButton).toBeEnabled();
+    expect(clearButton).toBeEnabled();
+    await user.click(applyButton);
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
     expect(fetch.mock.calls.at(-1)[0]).toContain('nombre=%C3%A1guila&clase=Ave');
+    await waitFor(() => expect(applyButton).toBeDisabled());
+    expect(clearButton).toBeEnabled();
 
     await user.clear(screen.getByLabelText(/peso mín/i));
     await user.type(screen.getByLabelText(/peso mín/i), '500');
     await user.clear(screen.getByLabelText(/peso máx/i));
     await user.type(screen.getByLabelText(/peso máx/i), '100');
-    await user.click(screen.getByRole('button', { name: /aplicar filtros/i }));
+    await user.click(applyButton);
     expect(await screen.findByRole('alert')).toHaveTextContent(/peso mínimo no puede ser mayor/i);
     expect(fetch).toHaveBeenCalledTimes(2);
 
-    await user.click(screen.getByRole('button', { name: /limpiar filtros/i }));
+    await user.click(clearButton);
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
     expect(fetch.mock.calls.at(-1)[0]).toBe('http://localhost:3000/api/animales');
+    await waitFor(() => expect(applyButton).toBeDisabled());
+    expect(clearButton).toBeDisabled();
+  });
+
+  test('conserva los cambios pendientes cuando falla una búsqueda', async () => {
+    storeSession();
+    fetch
+      .mockResolvedValueOnce(response(animals))
+      .mockResolvedValueOnce(response({ message: 'No se pudo completar la búsqueda.' }, 500));
+    const user = userEvent.setup();
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    const applyButton = screen.getByRole('button', { name: /aplicar filtros/i });
+    await user.type(screen.getByLabelText(/nombre común/i), 'león');
+    await user.click(applyButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no se pudo completar la búsqueda/i);
+    expect(applyButton).toBeEnabled();
+    expect(screen.getByRole('button', { name: /limpiar filtros/i })).toBeEnabled();
   });
 
   test('ordena columnas en ambas direcciones', async () => {
@@ -191,11 +232,38 @@ describe('buscador protegido', () => {
     const names = () => screen.getAllByRole('row').slice(1).map((row) =>
       within(row).getByText(/^(León|Águila)$/).textContent
     );
+    const speciesHeader = screen.getByRole('columnheader', { name: /especie/i });
+    const weightHeader = screen.getByRole('columnheader', { name: /peso promedio/i });
+
+    expect(speciesHeader).toHaveAttribute('aria-sort', 'ascending');
+    expect(speciesHeader).toHaveClass('is-sorted');
+    expect(weightHeader.querySelector('.sort-pair')).toHaveTextContent('▲▼');
 
     await user.click(screen.getByRole('button', { name: /peso promedio/i }));
     expect(names()).toEqual(['Águila', 'León']);
+    expect(weightHeader).toHaveAttribute('aria-sort', 'ascending');
+    expect(weightHeader).toHaveClass('is-sorted');
+    expect(screen.getByRole('button', { name: /peso promedio: ordenar descendente/i })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /peso promedio/i }));
     expect(names()).toEqual(['León', 'Águila']);
+    expect(weightHeader).toHaveAttribute('aria-sort', 'descending');
+    expect(within(weightHeader).getByText('▼')).toBeInTheDocument();
+  });
+
+  test('asigna tonos estables por categoría y valor', async () => {
+    storeSession();
+    fetch.mockResolvedValue(response(animals));
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    const lionRow = screen.getByText('León').closest('tr');
+    expect(within(lionRow).getByText('Mamífero')).toHaveClass('badge-toned', 'chip-class-mammal');
+    expect(within(lionRow).getByText('Carnívoro')).toHaveClass('badge-toned', 'chip-diet-carnivore');
+    expect(within(lionRow).getByText('África')).toHaveClass('badge-toned', 'chip-continent-africa');
+
+    const eagleRow = screen.getByText('Águila').closest('tr');
+    expect(within(eagleRow).getByText('Ave')).toHaveClass('chip-class-bird');
+    expect(within(eagleRow).getByText('Europa')).toHaveClass('chip-continent-europe');
   });
 
   test('exporta a Excel el subconjunto visible en el orden actual', async () => {

@@ -14,6 +14,9 @@ Esta matriz registra resultados ejecutados sobre la versión indicada en cada fi
 | Suite local CSV/XLSX | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `05da18a` | 29 backend + 20 frontend y build aprobados |
 | Auditoría post-XLSX | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `05da18a` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas |
 | UAT exportación XLSX | 2026-09-26 | Microsoft Excel, Windows 11 x64 | Versión de Excel no informada | Working tree sobre `05da18a` | El usuario confirmó que el archivo descargado abre y funciona correctamente |
+| Suite final de interfaz | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `ed57f2c` | 29 backend + 25 frontend y build aprobados |
+| Auditoría post-interfaz | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `ed57f2c` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas; sin dependencias nuevas |
+| UAT visual de interfaz | 2026-09-26 | Chrome headless 153, Windows 11 x64 | Desktop 1382×904 y viewport 390×844 | Working tree sobre `ed57f2c` | Jerarquía de acciones, hover de logout, orden, chips y responsive aprobados |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -59,8 +62,10 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | UX-03 Respuesta no JSON | Error HTTP con texto plano | Abrir catálogo | Mensaje visible, sin error de parseo | Test frontend; automática | Aprobado |
 | UX-04 Teclado | Catálogo cargado | Recorrer desde Nombre con Tab | Orden Nombre → Clase → Dieta → Continente | Test frontend; automática | Aprobado |
 | UX-05 Responsive | Sesión válida | Abrir a 390×844 | Filtros apilados, cabecera utilizable y tabla desplazable | UAT visual Chrome; manual | Aprobado |
+| UX-06 Estado de filtros | Catálogo inicial cargado | Editar, aplicar con éxito, provocar error y limpiar | Ambos botones parten deshabilitados; los cambios habilitan acciones; el éxito sincroniza; el error permite reintentar; limpiar consulta el catálogo | `app.test.jsx`; automática | Aprobado |
+| UX-07 Jerarquía visual | Catálogo cargado | Revisar logout, CSV, Excel, flechas y chips | Colores diferenciados, hover rojo, columna activa visible, indicadores comprensibles y tonos estables por categoría/valor | Tests de componentes/utilidad + UAT desktop/mobile; mixta | Aprobado |
 | QA-01 Instalación limpia | Servidores detenidos; lockfiles presentes | `npm run install:all` | Ambos `npm ci` completan | Registro de ejecución; manual/terminal | Aprobado |
-| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 20 frontend + Vite build | Salida de suite final; automática | Aprobado |
+| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 25 frontend + Vite build | Salida de suite final; automática | Aprobado |
 | QA-03 Auditoría | Acceso a registry npm | `npm run audit` | Sin vulnerabilidades altas/críticas | 0 backend; 2 moderadas RR; automática | Aprobado con riesgo aceptado |
 | QA-04 CI Node 20/22 | Repositorio privado publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937); automática | Aprobado |
 
@@ -80,8 +85,12 @@ La exposición actual es baja: esta solución es CSR, no hidrata errores SSR y n
 - África + peligro + peso mínimo 100 devolvió Elefante africano, Jirafa y León.
 - La búsqueda inexistente mostró estado vacío; restablecer devolvió los 30 resultados.
 - El orden por peso se comprobó en ambas direcciones.
+- Los encabezados inactivos mostraron `▲▼`; la columna activa mostró una sola flecha, fondo tenue y `aria-sort` coherente.
+- Logout usó rojo pastel y cambió a `rgb(220, 38, 38)` con texto blanco en hover; CSV y Excel quedaron diferenciados en violeta y verde pastel.
+- Los chips de clase, dieta y continente conservaron texto y bordes legibles, con tonos pastel determinísticos por valor.
+- Aplicar y limpiar comenzaron deshabilitados; editar habilitó las acciones, aplicar sincronizó el estado y limpiar recuperó el catálogo completo.
 - El archivo `.xlsx` descargado abrió y funcionó correctamente en Microsoft Excel según confirmación del usuario.
-- A 390×844 los filtros quedaron apilados y la tabla conservó desplazamiento horizontal accesible.
+- A 390×844 los filtros quedaron apilados, las acciones de exportación ocuparon el ancho disponible y no hubo desborde horizontal de página; la tabla conservó su desplazamiento interno.
 - Logout eliminó la sesión y volvió a `/login`.
 
 La estructura, contenido, tipos, orden y mecanismo de descarga de CSV/XLSX quedaron cubiertos por tests automatizados. La apertura del `.xlsx` también quedó aceptada manualmente en el Excel instalado; el CSV conserva su evidencia automatizada y el diagnóstico de codificación documentado.

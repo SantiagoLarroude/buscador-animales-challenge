@@ -13,8 +13,12 @@ Este documento detalla el diseño de arquitectura y la guía paso a paso para im
 | Búsqueda reactiva con debounce | Pendiente | Se conserva el envío explícito para una demo predecible |
 | Persistencia SQLite | Pendiente | JSON sigue alineado con la consigna y simplifica la instalación |
 | CI con GitHub Actions | Implementada | Matriz Node 20.19/22, tests, build y audit high/critical |
+| Tema claro/oscuro | Pendiente | Requiere definir tokens semánticos, persistencia de preferencia y regresión visual completa |
+| Idioma español/inglés | Pendiente | Requiere externalizar textos, formatos y mensajes antes de incorporar un selector |
 
 La implementación real prevalece sobre los fragmentos orientativos de este roadmap. Los resultados ejecutados están en [casos-de-uso-verificados.md](casos-de-uso-verificados.md).
+
+Los controles de tema e idioma se difieren deliberadamente: no se muestran opciones incompletas en la interfaz. Su implementación deberá cubrir todos los textos y estados, conservar la preferencia del usuario y verificarse tanto en desktop como en mobile.
 
 ---
 

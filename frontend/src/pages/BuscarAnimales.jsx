@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiFetch from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getChipToneClass } from '../utils/chipTones.js';
 import { downloadAnimalsCsv } from '../utils/exportCsv.js';
 import { downloadAnimalsXlsx } from '../utils/exportXlsx.js';
 
@@ -10,16 +11,68 @@ const CLASES = ['Mamífero', 'Ave', 'Reptil', 'Anfibio', 'Pez', 'Insecto'];
 const DIETAS = ['Carnívoro', 'Herbívoro', 'Omnívoro'];
 const CONTINENTES = ['África', 'América', 'Oceanía', 'Asia', 'Europa', 'Antártida'];
 const NUMERIC_SORT_KEYS = new Set(['pesoPromedioKg', 'esperanzaVidaAnios']);
+const EMPTY_FILTERS = Object.freeze({
+  nombre: '',
+  clase: '',
+  dieta: '',
+  continente: '',
+  pesoMin: '',
+  pesoMax: '',
+  enPeligro: false,
+});
+
+function normalizeNumberFilter(value) {
+  const trimmed = String(value ?? '').trim();
+  if (!trimmed) return '';
+  const numericValue = Number(trimmed);
+  return Number.isFinite(numericValue) ? String(numericValue) : trimmed;
+}
+
+function normalizeFilters(filters) {
+  return {
+    nombre: String(filters.nombre ?? '').trim(),
+    clase: filters.clase || '',
+    dieta: filters.dieta || '',
+    continente: filters.continente || '',
+    pesoMin: normalizeNumberFilter(filters.pesoMin),
+    pesoMax: normalizeNumberFilter(filters.pesoMax),
+    enPeligro: Boolean(filters.enPeligro),
+  };
+}
+
+function filtersAreEqual(first, second) {
+  return JSON.stringify(normalizeFilters(first)) === JSON.stringify(normalizeFilters(second));
+}
+
+function hasActiveFilters(filters) {
+  const normalized = normalizeFilters(filters);
+  return Boolean(
+    normalized.nombre || normalized.clase || normalized.dieta || normalized.continente ||
+    normalized.pesoMin || normalized.pesoMax || normalized.enPeligro
+  );
+}
 
 function SortableHeader({ label, sortKey, sortConfig, onSort, className }) {
   const isActive = sortConfig.key === sortKey;
-  const directionLabel = isActive && sortConfig.direction === 'asc' ? '▲' : '▼';
+  const isAscending = isActive && sortConfig.direction === 'asc';
+  const directionLabel = isAscending ? '▲' : '▼';
+  const nextDirection = isActive && isAscending ? 'descendente' : 'ascendente';
+  const headerClassName = [className, isActive ? 'is-sorted' : ''].filter(Boolean).join(' ');
 
   return (
-    <th className={className} aria-sort={isActive ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
-      <button type="button" className="sort-button" onClick={() => onSort(sortKey)}>
+    <th className={headerClassName} aria-sort={isActive ? (isAscending ? 'ascending' : 'descending') : 'none'}>
+      <button
+        type="button"
+        className="sort-button"
+        onClick={() => onSort(sortKey)}
+        aria-label={`${label}: ordenar ${nextDirection}`}
+      >
         {label}
-        <span aria-hidden="true" className="sort-indicator">{isActive ? directionLabel : '↕'}</span>
+        <span aria-hidden="true" className={`sort-indicator ${isActive ? 'is-active' : ''}`}>
+          {isActive ? directionLabel : (
+            <span className="sort-pair"><span>▲</span><span>▼</span></span>
+          )}
+        </span>
       </button>
     </th>
   );
@@ -28,58 +81,49 @@ function SortableHeader({ label, sortKey, sortConfig, onSort, className }) {
 export default function BuscarAnimales() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [nombre, setNombre] = useState('');
-  const [clase, setClase] = useState('');
-  const [dieta, setDieta] = useState('');
-  const [continente, setContinente] = useState('');
-  const [pesoMin, setPesoMin] = useState('');
-  const [pesoMax, setPesoMax] = useState('');
-  const [enPeligro, setEnPeligro] = useState(false);
+  const [filters, setFilters] = useState({ ...EMPTY_FILTERS });
+  const [appliedFilters, setAppliedFilters] = useState({ ...EMPTY_FILTERS });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [exportingXlsx, setExportingXlsx] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'nombreComun', direction: 'asc' });
 
-  const fetchAnimals = useCallback(async (filters = {}) => {
+  const fetchAnimals = useCallback(async (requestedFilters) => {
+    const normalizedFilters = normalizeFilters(requestedFilters);
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
-      const n = filters.nombre !== undefined ? filters.nombre : nombre;
-      const c = filters.clase !== undefined ? filters.clase : clase;
-      const d = filters.dieta !== undefined ? filters.dieta : dieta;
-      const cont = filters.continente !== undefined ? filters.continente : continente;
-      const pMin = filters.pesoMin !== undefined ? filters.pesoMin : pesoMin;
-      const pMax = filters.pesoMax !== undefined ? filters.pesoMax : pesoMax;
-      const pDanger = filters.enPeligro !== undefined ? filters.enPeligro : enPeligro;
-
-      if (n.trim()) params.append('nombre', n.trim());
-      if (c) params.append('clase', c);
-      if (d) params.append('dieta', d);
-      if (cont) params.append('continente', cont);
-      if (pMin !== '') params.append('pesoMin', pMin);
-      if (pMax !== '') params.append('pesoMax', pMax);
-      if (pDanger) params.append('enPeligro', 'true');
+      if (normalizedFilters.nombre) params.append('nombre', normalizedFilters.nombre);
+      if (normalizedFilters.clase) params.append('clase', normalizedFilters.clase);
+      if (normalizedFilters.dieta) params.append('dieta', normalizedFilters.dieta);
+      if (normalizedFilters.continente) params.append('continente', normalizedFilters.continente);
+      if (normalizedFilters.pesoMin !== '') params.append('pesoMin', normalizedFilters.pesoMin);
+      if (normalizedFilters.pesoMax !== '') params.append('pesoMax', normalizedFilters.pesoMax);
+      if (normalizedFilters.enPeligro) params.append('enPeligro', 'true');
 
       const queryString = params.toString();
       const endpoint = queryString ? `/animales?${queryString}` : '/animales';
       const data = await apiFetch(endpoint);
       setResults(data);
+      setAppliedFilters(normalizedFilters);
+      return true;
     } catch (err) {
       if (err.status === 401) {
         logout();
         navigate('/login', { replace: true, state: { sessionExpired: true } });
-        return;
+        return false;
       }
       setError(err.message || 'Error al obtener animales');
+      return false;
     } finally {
       setLoading(false);
     }
-  }, [nombre, clase, dieta, continente, pesoMin, pesoMax, enPeligro, logout, navigate]);
+  }, [logout, navigate]);
 
   useEffect(() => {
-    fetchAnimals();
+    fetchAnimals(EMPTY_FILTERS);
   }, []); // La búsqueda inicial debe ejecutarse sólo al montar la ruta protegida.
 
   const sortedResults = useMemo(() => {
@@ -94,9 +138,9 @@ export default function BuscarAnimales() {
     });
   }, [results, sortConfig]);
 
-  const validateFilters = () => {
-    const min = pesoMin === '' ? null : Number(pesoMin);
-    const max = pesoMax === '' ? null : Number(pesoMax);
+  const validateFilters = (filtersToValidate) => {
+    const min = filtersToValidate.pesoMin === '' ? null : Number(filtersToValidate.pesoMin);
+    const max = filtersToValidate.pesoMax === '' ? null : Number(filtersToValidate.pesoMax);
     if ((min !== null && (!Number.isFinite(min) || min < 0)) ||
         (max !== null && (!Number.isFinite(max) || max < 0))) {
       return 'Los pesos deben ser números mayores o iguales a 0.';
@@ -107,33 +151,24 @@ export default function BuscarAnimales() {
     return null;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const validationError = validateFilters();
+    const validationError = validateFilters(filters);
     if (validationError) {
       setError(validationError);
       return;
     }
-    fetchAnimals();
+    await fetchAnimals(filters);
   };
 
-  const handleReset = () => {
-    setNombre('');
-    setClase('');
-    setDieta('');
-    setContinente('');
-    setPesoMin('');
-    setPesoMax('');
-    setEnPeligro(false);
-    fetchAnimals({
-      nombre: '',
-      clase: '',
-      dieta: '',
-      continente: '',
-      pesoMin: '',
-      pesoMax: '',
-      enPeligro: false,
-    });
+  const handleReset = async () => {
+    const emptyFilters = { ...EMPTY_FILTERS };
+    setFilters(emptyFilters);
+    await fetchAnimals(emptyFilters);
+  };
+
+  const updateFilter = (key, value) => {
+    setFilters((current) => ({ ...current, [key]: value }));
   };
 
   const handleSort = (key) => {
@@ -155,9 +190,8 @@ export default function BuscarAnimales() {
     }
   };
 
-  const hasActiveFilters = Boolean(
-    nombre || clase || dieta || continente || pesoMin !== '' || pesoMax !== '' || enPeligro
-  );
+  const hasPendingChanges = !filtersAreEqual(filters, appliedFilters);
+  const canClearFilters = hasActiveFilters(filters) || hasActiveFilters(appliedFilters);
 
   return (
     <div className="app-layout">
@@ -179,14 +213,18 @@ export default function BuscarAnimales() {
                   id="filter-nombre"
                   type="text"
                   placeholder="Ej: León, Delfín..."
-                  value={nombre}
-                  onChange={(event) => setNombre(event.target.value)}
+                  value={filters.nombre}
+                  onChange={(event) => updateFilter('nombre', event.target.value)}
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="filter-clase">Clase</label>
-                <select id="filter-clase" value={clase} onChange={(event) => setClase(event.target.value)}>
+                <select
+                  id="filter-clase"
+                  value={filters.clase}
+                  onChange={(event) => updateFilter('clase', event.target.value)}
+                >
                   <option value="">Todas las clases</option>
                   {CLASES.map((value) => <option key={value} value={value}>{value}</option>)}
                 </select>
@@ -194,7 +232,11 @@ export default function BuscarAnimales() {
 
               <div className="form-group">
                 <label htmlFor="filter-dieta">Dieta</label>
-                <select id="filter-dieta" value={dieta} onChange={(event) => setDieta(event.target.value)}>
+                <select
+                  id="filter-dieta"
+                  value={filters.dieta}
+                  onChange={(event) => updateFilter('dieta', event.target.value)}
+                >
                   <option value="">Todas las dietas</option>
                   {DIETAS.map((value) => <option key={value} value={value}>{value}</option>)}
                 </select>
@@ -202,7 +244,11 @@ export default function BuscarAnimales() {
 
               <div className="form-group">
                 <label htmlFor="filter-continente">Continente</label>
-                <select id="filter-continente" value={continente} onChange={(event) => setContinente(event.target.value)}>
+                <select
+                  id="filter-continente"
+                  value={filters.continente}
+                  onChange={(event) => updateFilter('continente', event.target.value)}
+                >
                   <option value="">Todos los continentes</option>
                   {CONTINENTES.map((value) => <option key={value} value={value}>{value}</option>)}
                 </select>
@@ -216,8 +262,8 @@ export default function BuscarAnimales() {
                   min="0"
                   step="any"
                   placeholder="0"
-                  value={pesoMin}
-                  onChange={(event) => setPesoMin(event.target.value)}
+                  value={filters.pesoMin}
+                  onChange={(event) => updateFilter('pesoMin', event.target.value)}
                 />
               </div>
 
@@ -229,8 +275,8 @@ export default function BuscarAnimales() {
                   min="0"
                   step="any"
                   placeholder="5000"
-                  value={pesoMax}
-                  onChange={(event) => setPesoMax(event.target.value)}
+                  value={filters.pesoMax}
+                  onChange={(event) => updateFilter('pesoMax', event.target.value)}
                 />
               </div>
             </div>
@@ -240,22 +286,29 @@ export default function BuscarAnimales() {
                 <input
                   id="filter-enpeligro"
                   type="checkbox"
-                  checked={enPeligro}
-                  onChange={(event) => setEnPeligro(event.target.checked)}
+                  checked={filters.enPeligro}
+                  onChange={(event) => updateFilter('enPeligro', event.target.checked)}
                 />
                 <span>⚠️ Mostrar solo especies en peligro de extinción</span>
               </label>
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn btn-primary" disabled={loading}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading || !hasPendingChanges}
+              >
                 🔍 {loading ? 'Buscando...' : 'Aplicar Filtros'}
               </button>
-              {hasActiveFilters && (
-                <button type="button" onClick={handleReset} className="btn btn-secondary" disabled={loading}>
-                  Limpiar Filtros
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleReset}
+                className="btn btn-secondary"
+                disabled={loading || !canClearFilters}
+              >
+                Limpiar Filtros
+              </button>
             </div>
           </form>
         </section>
@@ -269,22 +322,25 @@ export default function BuscarAnimales() {
               <span className="results-badge">
                 {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
               </span>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => downloadAnimalsCsv(sortedResults)}
-                disabled={loading || exportingXlsx || sortedResults.length === 0}
-              >
-                Exportar CSV
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={handleXlsxExport}
-                disabled={loading || exportingXlsx || sortedResults.length === 0}
-              >
-                {exportingXlsx ? 'Generando Excel...' : 'Exportar Excel (.xlsx)'}
-              </button>
+              <div className="export-actions">
+                <button
+                  type="button"
+                  className="btn btn-export-csv btn-sm"
+                  onClick={() => downloadAnimalsCsv(sortedResults)}
+                  disabled={loading || exportingXlsx || sortedResults.length === 0}
+                >
+                  Exportar CSV
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-export-excel btn-sm"
+                  onClick={handleXlsxExport}
+                  disabled={loading || exportingXlsx || sortedResults.length === 0}
+                  aria-busy={exportingXlsx}
+                >
+                  {exportingXlsx ? 'Generando Excel...' : 'Exportar Excel (.xlsx)'}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -298,7 +354,7 @@ export default function BuscarAnimales() {
               <span className="empty-icon" aria-hidden="true">🍃</span>
               <h4>No se encontraron animales</h4>
               <p>Probá modificando los criterios de búsqueda o limpiando los filtros.</p>
-              {hasActiveFilters && (
+              {canClearFilters && (
                 <button onClick={handleReset} className="btn btn-secondary btn-sm">
                   Restablecer filtros
                 </button>
@@ -329,10 +385,22 @@ export default function BuscarAnimales() {
                           <span className="animal-scientific">{animal.nombreCientifico}</span>
                         </div>
                       </td>
-                      <td><span className="badge badge-neutral">{animal.clase}</span></td>
-                      <td><span className="badge badge-info">{animal.dieta}</span></td>
+                      <td>
+                        <span className={`badge badge-toned ${getChipToneClass('clase', animal.clase)}`}>
+                          {animal.clase}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`badge badge-toned ${getChipToneClass('dieta', animal.dieta)}`}>
+                          {animal.dieta}
+                        </span>
+                      </td>
                       <td>{animal.habitat}</td>
-                      <td><span className="badge badge-outline">{animal.continente}</span></td>
+                      <td>
+                        <span className={`badge badge-toned ${getChipToneClass('continente', animal.continente)}`}>
+                          {animal.continente}
+                        </span>
+                      </td>
                       <td className="text-right"><strong>{animal.pesoPromedioKg}</strong> kg</td>
                       <td className="text-right"><strong>{animal.esperanzaVidaAnios}</strong> años</td>
                       <td>

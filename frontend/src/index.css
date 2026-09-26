@@ -13,6 +13,16 @@
   --success-bg: #f0fdf4;
   --info: #0284c7;
   --info-bg: #f0f9ff;
+  --logout-bg: #fee2e2;
+  --logout-text: #b91c1c;
+  --logout-border: #fecaca;
+  --logout-hover: #dc2626;
+  --excel-bg: #dcfce7;
+  --excel-text: #166534;
+  --excel-border: #86efac;
+  --csv-bg: #ede9fe;
+  --csv-text: #5b21b6;
+  --csv-border: #c4b5fd;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -321,6 +331,40 @@ a:focus-visible,
   color: var(--text-main);
 }
 
+.btn-danger-soft {
+  background-color: var(--logout-bg);
+  color: var(--logout-text);
+  border-color: var(--logout-border);
+}
+
+.btn-danger-soft:hover:not(:disabled) {
+  background-color: var(--logout-hover);
+  border-color: var(--logout-hover);
+  color: #ffffff;
+}
+
+.btn-export-csv {
+  background-color: var(--csv-bg);
+  color: var(--csv-text);
+  border-color: var(--csv-border);
+}
+
+.btn-export-csv:hover:not(:disabled) {
+  background-color: #ddd6fe;
+  border-color: #a78bfa;
+}
+
+.btn-export-excel {
+  background-color: var(--excel-bg);
+  color: var(--excel-text);
+  border-color: var(--excel-border);
+}
+
+.btn-export-excel:hover:not(:disabled) {
+  background-color: #bbf7d0;
+  border-color: #4ade80;
+}
+
 .btn-sm {
   padding: 0.4rem 0.8rem;
   font-size: 0.82rem;
@@ -371,6 +415,14 @@ a:focus-visible,
   flex-wrap: wrap;
 }
 
+.export-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .results-badge {
   background-color: var(--primary-light);
   color: var(--primary);
@@ -403,6 +455,11 @@ a:focus-visible,
   white-space: nowrap;
 }
 
+.animals-table th.is-sorted {
+  background-color: var(--primary-light);
+  color: var(--primary-hover);
+}
+
 .sort-button {
   display: inline-flex;
   align-items: center;
@@ -421,8 +478,24 @@ a:focus-visible,
 }
 
 .sort-indicator {
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1rem;
+  font-size: 0.82rem;
+}
+
+.sort-indicator.is-active {
   color: var(--primary);
-  font-size: 0.75rem;
+}
+
+.sort-pair {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  font-size: 0.58rem;
+  line-height: 0.62;
 }
 
 .animals-table td {
@@ -496,6 +569,34 @@ a:focus-visible,
   border: 1px solid var(--border-color);
 }
 
+.badge-toned {
+  --chip-hue: 216;
+  background-color: hsl(var(--chip-hue) 85% 94%);
+  color: hsl(var(--chip-hue) 55% 28%);
+  border: 1px solid hsl(var(--chip-hue) 65% 78%);
+}
+
+.chip-class-mammal,
+.chip-class-default { --chip-hue: 216; }
+.chip-class-bird { --chip-hue: 202; }
+.chip-class-reptile { --chip-hue: 190; }
+.chip-class-amphibian { --chip-hue: 232; }
+.chip-class-fish { --chip-hue: 210; }
+.chip-class-insect { --chip-hue: 248; }
+
+.chip-diet-carnivore { --chip-hue: 22; }
+.chip-diet-herbivore,
+.chip-diet-default { --chip-hue: 42; }
+.chip-diet-omnivore { --chip-hue: 54; }
+
+.chip-continent-africa { --chip-hue: 140; }
+.chip-continent-america { --chip-hue: 170; }
+.chip-continent-oceania { --chip-hue: 182; }
+.chip-continent-asia,
+.chip-continent-default { --chip-hue: 156; }
+.chip-continent-europe { --chip-hue: 128; }
+.chip-continent-antarctica { --chip-hue: 192; }
+
 /* States */
 .loading-state,
 .empty-state {
@@ -557,6 +658,20 @@ a:focus-visible,
 
   .results-actions {
     width: 100%;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .results-badge {
+    flex-basis: 100%;
+  }
+
+  .export-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .export-actions .btn {
+    flex: 1 1 160px;
   }
 }
