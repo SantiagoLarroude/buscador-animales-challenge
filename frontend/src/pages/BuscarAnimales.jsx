@@ -4,6 +4,7 @@ import apiFetch from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { downloadAnimalsCsv } from '../utils/exportCsv.js';
+import { downloadAnimalsXlsx } from '../utils/exportXlsx.js';
 
 const CLASES = ['Mamífero', 'Ave', 'Reptil', 'Anfibio', 'Pez', 'Insecto'];
 const DIETAS = ['Carnívoro', 'Herbívoro', 'Omnívoro'];
@@ -37,6 +38,7 @@ export default function BuscarAnimales() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [exportingXlsx, setExportingXlsx] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'nombreComun', direction: 'asc' });
 
   const fetchAnimals = useCallback(async (filters = {}) => {
@@ -139,6 +141,18 @@ export default function BuscarAnimales() {
       key,
       direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
     }));
+  };
+
+  const handleXlsxExport = async () => {
+    setExportingXlsx(true);
+    setError(null);
+    try {
+      await downloadAnimalsXlsx(sortedResults);
+    } catch {
+      setError('No se pudo generar el archivo Excel. Intentá nuevamente.');
+    } finally {
+      setExportingXlsx(false);
+    }
   };
 
   const hasActiveFilters = Boolean(
@@ -259,9 +273,17 @@ export default function BuscarAnimales() {
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={() => downloadAnimalsCsv(sortedResults)}
-                disabled={loading || sortedResults.length === 0}
+                disabled={loading || exportingXlsx || sortedResults.length === 0}
               >
                 Exportar CSV
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleXlsxExport}
+                disabled={loading || exportingXlsx || sortedResults.length === 0}
+              >
+                {exportingXlsx ? 'Generando Excel...' : 'Exportar Excel (.xlsx)'}
               </button>
             </div>
           </div>

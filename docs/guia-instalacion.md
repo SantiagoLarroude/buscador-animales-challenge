@@ -217,8 +217,8 @@ frontend/
   src/api/               cliente HTTP y errores normalizados
   src/context/           sesión local
   src/pages/             registro, login y buscador
-  src/test/              componentes y CSV
-  src/utils/             exportación CSV
+  src/test/              componentes, CSV y Excel
+  src/utils/             datos compartidos y exportación CSV/XLSX
 docs/                    documentación de entrega
 .github/workflows/       CI para Node 20 y 22
 ```

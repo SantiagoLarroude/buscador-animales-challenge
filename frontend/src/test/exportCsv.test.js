@@ -21,7 +21,8 @@ describe('animalsToCsv', () => {
       },
     ]);
 
-    expect(csv.startsWith('\uFEFFsep=,\r\n')).toBe(true);
+    expect(csv.startsWith('\uFEFFNombre común,Nombre científico')).toBe(true);
+    expect(csv.split('\r\n')[0]).toBe('\uFEFFNombre común,Nombre científico,Clase,Hábitat,Dieta,Peso promedio (kg),Esperanza de vida (años),Continente,En peligro de extinción');
     expect(csv).toContain('Nombre común,Nombre científico');
     expect(csv).toContain('"Ñandú, grande"');
     expect(csv).toContain('"Rhea ""americana"""');

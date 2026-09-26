@@ -5,6 +5,14 @@ import { MemoryRouter } from 'react-router-dom';
 import App from '../App.jsx';
 import { AuthProvider } from '../context/AuthContext.jsx';
 
+const { downloadAnimalsXlsxMock } = vi.hoisted(() => ({
+  downloadAnimalsXlsxMock: vi.fn(),
+}));
+
+vi.mock('../utils/exportXlsx.js', () => ({
+  downloadAnimalsXlsx: downloadAnimalsXlsxMock,
+}));
+
 const animals = [
   {
     id: 1,
@@ -57,6 +65,8 @@ function storeSession() {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  downloadAnimalsXlsxMock.mockReset();
+  downloadAnimalsXlsxMock.mockResolvedValue(true);
   vi.stubGlobal('fetch', vi.fn());
 });
 
@@ -186,6 +196,33 @@ describe('buscador protegido', () => {
     expect(names()).toEqual(['Águila', 'León']);
     await user.click(screen.getByRole('button', { name: /peso promedio/i }));
     expect(names()).toEqual(['León', 'Águila']);
+  });
+
+  test('exporta a Excel el subconjunto visible en el orden actual', async () => {
+    storeSession();
+    fetch.mockResolvedValue(response(animals));
+    const user = userEvent.setup();
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    await user.click(screen.getByRole('button', { name: /exportar excel/i }));
+
+    await waitFor(() => expect(downloadAnimalsXlsxMock).toHaveBeenCalledOnce());
+    expect(downloadAnimalsXlsxMock.mock.calls[0][0].map(({ nombreComun }) => nombreComun))
+      .toEqual(['Águila', 'León']);
+  });
+
+  test('muestra un error accesible si falla la exportación Excel', async () => {
+    storeSession();
+    fetch.mockResolvedValue(response(animals));
+    downloadAnimalsXlsxMock.mockRejectedValueOnce(new Error('falló la exportación'));
+    const user = userEvent.setup();
+    renderApp('/animales');
+    await screen.findByText('León');
+
+    await user.click(screen.getByRole('button', { name: /exportar excel/i }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no se pudo generar el archivo excel/i);
   });
 
   test('hace logout y elimina la sesión local', async () => {

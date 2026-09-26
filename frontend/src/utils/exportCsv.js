@@ -1,14 +1,4 @@
-const CSV_COLUMNS = [
-  ['Nombre común', 'nombreComun'],
-  ['Nombre científico', 'nombreCientifico'],
-  ['Clase', 'clase'],
-  ['Hábitat', 'habitat'],
-  ['Dieta', 'dieta'],
-  ['Peso promedio (kg)', 'pesoPromedioKg'],
-  ['Esperanza de vida (años)', 'esperanzaVidaAnios'],
-  ['Continente', 'continente'],
-  ['En peligro de extinción', 'enPeligroExtincion'],
-];
+import { ANIMAL_EXPORT_COLUMNS, getAnimalExportValue } from './animalExport.js';
 
 function escapeCsvCell(value) {
   let text = value === null || value === undefined ? '' : String(value);
@@ -18,15 +8,12 @@ function escapeCsvCell(value) {
 }
 
 export function animalsToCsv(animals) {
-  const headers = CSV_COLUMNS.map(([label]) => escapeCsvCell(label)).join(',');
-  const rows = animals.map((animal) => CSV_COLUMNS.map(([, key]) => {
-    const value = key === 'enPeligroExtincion'
-      ? (animal[key] ? 'Sí' : 'No')
-      : animal[key];
-    return escapeCsvCell(value);
-  }).join(','));
+  const headers = ANIMAL_EXPORT_COLUMNS.map(({ label }) => escapeCsvCell(label)).join(',');
+  const rows = animals.map((animal) => ANIMAL_EXPORT_COLUMNS.map(({ key }) =>
+    escapeCsvCell(getAnimalExportValue(animal, key))
+  ).join(','));
 
-  return `\uFEFFsep=,\r\n${[headers, ...rows].join('\r\n')}\r\n`;
+  return `\uFEFF${[headers, ...rows].join('\r\n')}\r\n`;
 }
 
 export function downloadAnimalsCsv(animals, date = new Date()) {

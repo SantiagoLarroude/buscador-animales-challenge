@@ -1,6 +1,6 @@
 # Casos de uso verificados
 
-Esta matriz registra resultados ejecutados sobre la versión funcional `9388bbe`. **Aprobado** significa que existe evidencia automática o manual sobre esa versión; una implementación o inspección de código por sí sola no cuenta como aprobación.
+Esta matriz registra resultados ejecutados sobre la versión indicada en cada fila. **Aprobado** significa que existe evidencia automática o manual sobre esa versión; una implementación o inspección de código por sí sola no cuenta como aprobación.
 
 ## Registro de ejecuciones
 
@@ -11,6 +11,9 @@ Esta matriz registra resultados ejecutados sobre la versión funcional `9388bbe`
 | Auditoría | 2026-09-24 | Windows 11 x64 | npm audit | `9388bbe` | 0 backend; 2 moderadas frontend; 0 altas/críticas |
 | UAT visual | 2026-09-23 | Chrome, Windows 11 x64 | Desktop y viewport 390×844 | `9388bbe` (código de UI sin cambios desde UAT) | Flujo principal, orden, responsive y logout aprobados |
 | CI remoto | 2026-09-24 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `256018a` | [Run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937) aprobado |
+| Suite local CSV/XLSX | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `05da18a` | 29 backend + 20 frontend y build aprobados |
+| Auditoría post-XLSX | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `05da18a` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas |
+| UAT exportación XLSX | 2026-09-26 | Microsoft Excel, Windows 11 x64 | Versión de Excel no informada | Working tree sobre `05da18a` | El usuario confirmó que el archivo descargado abre y funciona correctamente |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -45,16 +48,19 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | CAT-13 Restablecer | Filtros activos | Activar limpiar/restablecer | Controles vacíos y catálogo completo | Test frontend + UAT visual; mixta | Aprobado |
 | PLUS-01 Orden ascendente | Dos o más resultados | Activar encabezado Peso una vez | Menor a mayor; `aria-sort` coherente | Test frontend + UAT 190/800/5000; mixta | Aprobado |
 | PLUS-02 Orden descendente | Orden ascendente activo | Activar mismo encabezado | Mayor a menor | Test frontend + UAT 5000/800/190; mixta | Aprobado |
-| PLUS-03 CSV contenido | Subconjunto ordenado con `Ñ`, acentos, comas y comillas | Serializar | BOM, `sep=,`, encabezados españoles, escapes y orden conservado | `exportCsv.test.js`; automática | Aprobado |
+| PLUS-03 CSV contenido | Subconjunto ordenado con `Ñ`, acentos, comas y comillas | Serializar | BOM UTF-8, encabezados españoles en la primera fila, escapes y orden conservado | `exportCsv.test.js`; automática | Aprobado |
 | PLUS-04 CSV descarga | Uno o más resultados | Activar exportar | Nombre fechado, Blob y URL temporal liberada | Test de `downloadAnimalsCsv`; automática | Aprobado |
 | PLUS-05 CSV vacío | Sin resultados | Intentar exportar | Botón deshabilitado/no descarga | Test unitario + UAT visual; mixta | Aprobado |
+| PLUS-06 XLSX contenido | Subconjunto ordenado con `Ñ`, acentos y números | Generar Excel | Encabezados en fila 1, textos Unicode, pesos y años numéricos, fila fija y anchos legibles | `exportXlsx.test.js` + apertura en Excel; mixta | Aprobado |
+| PLUS-07 XLSX descarga | Uno o más resultados | Activar “Exportar Excel (.xlsx)” | Archivo XLSX real, nombre fechado, orden visible conservado y URL temporal liberada | Tests de utilidad/componente + UAT del usuario; mixta | Aprobado |
+| PLUS-08 XLSX error/vacío | Falla de generación o cero resultados | Exportar | Alerta accesible ante error; sin resultados no genera archivo | Tests de utilidad y componente; automática | Aprobado |
 | UX-01 Carga | Respuesta pendiente | Abrir catálogo | Estado `role=status`, `aria-busy` y acciones deshabilitadas | Test frontend; automática | Aprobado |
 | UX-02 Error de red | `fetch` rechaza | Abrir catálogo | Alerta accesible en español, sin crash | Test frontend; automática | Aprobado |
 | UX-03 Respuesta no JSON | Error HTTP con texto plano | Abrir catálogo | Mensaje visible, sin error de parseo | Test frontend; automática | Aprobado |
 | UX-04 Teclado | Catálogo cargado | Recorrer desde Nombre con Tab | Orden Nombre → Clase → Dieta → Continente | Test frontend; automática | Aprobado |
 | UX-05 Responsive | Sesión válida | Abrir a 390×844 | Filtros apilados, cabecera utilizable y tabla desplazable | UAT visual Chrome; manual | Aprobado |
 | QA-01 Instalación limpia | Servidores detenidos; lockfiles presentes | `npm run install:all` | Ambos `npm ci` completan | Registro de ejecución; manual/terminal | Aprobado |
-| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 14 frontend + Vite build | Salida de suite final; automática | Aprobado |
+| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 20 frontend + Vite build | Salida de suite final; automática | Aprobado |
 | QA-03 Auditoría | Acceso a registry npm | `npm run audit` | Sin vulnerabilidades altas/críticas | 0 backend; 2 moderadas RR; automática | Aprobado con riesgo aceptado |
 | QA-04 CI Node 20/22 | Repositorio privado publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937); automática | Aprobado |
 
@@ -74,7 +80,8 @@ La exposición actual es baja: esta solución es CSR, no hidrata errores SSR y n
 - África + peligro + peso mínimo 100 devolvió Elefante africano, Jirafa y León.
 - La búsqueda inexistente mostró estado vacío; restablecer devolvió los 30 resultados.
 - El orden por peso se comprobó en ambas direcciones.
+- El archivo `.xlsx` descargado abrió y funcionó correctamente en Microsoft Excel según confirmación del usuario.
 - A 390×844 los filtros quedaron apilados y la tabla conservó desplazamiento horizontal accesible.
 - Logout eliminó la sesión y volvió a `/login`.
 
-La apertura del archivo CSV descargado no se atribuye como prueba manual: el puente del navegador no expuso el evento de descarga. Su formato, contenido, orden y mecanismo de descarga sí quedaron aprobados mediante tres tests automatizados.
+La estructura, contenido, tipos, orden y mecanismo de descarga de CSV/XLSX quedaron cubiertos por tests automatizados. La apertura del `.xlsx` también quedó aceptada manualmente en el Excel instalado; el CSV conserva su evidencia automatizada y el diagnóstico de codificación documentado.

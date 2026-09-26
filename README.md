@@ -9,7 +9,7 @@ Challenge fullstack de CustomsWatch para registrar usuarios, iniciar sesión y c
 - Catálogo de 30 animales con filtros por nombre, clase, dieta, continente, rango de peso y peligro de extinción.
 - Validación consistente en frontend y API, incluidos rangos y booleanos estrictos.
 - Ordenamiento accesible ascendente/descendente por especie, clase, dieta, peso y esperanza de vida.
-- Exportación del subconjunto visible a CSV UTF-8 con BOM, encabezados en español y compatibilidad con Excel.
+- Exportación del subconjunto visible a CSV UTF-8 y a un archivo Excel `.xlsx` con encabezados, tipos y acentos preservados.
 - Estados de carga, error y resultado vacío; navegación por teclado y diseño responsive.
 - Tests de integración backend y tests de componentes/utilidades frontend.
 - CI en Node 20 y 22 con instalación limpia, tests, build y auditoría de vulnerabilidades altas/críticas.
@@ -32,7 +32,7 @@ La persistencia JSON respeta el alcance de la consigna y evita infraestructura e
 
 | Capa | Tecnología |
 | --- | --- |
-| Frontend | React 18, React Router 6.30.6, Axios, Vite 8 |
+| Frontend | React 18, React Router 6.30.6, Axios, Vite 8, write-excel-file 4.1.1 |
 | Backend | Node.js, Express 4, JWT, bcryptjs, CORS, dotenv |
 | Calidad | Node Test Runner, Supertest, Vitest 5, Testing Library, jsdom |
 | CI | GitHub Actions, matriz Node 20.19 y 22 |
@@ -167,7 +167,7 @@ Limitaciones deliberadas:
 1. **Introducción — 1 min.** Explicar el problema, el flujo y el esquema React → API Express → JSON. Señalar que JSON responde al alcance explícito de la consigna.
 2. **Autenticación — 2 min.** Mostrar una validación de registro, crear la cuenta ficticia, intentar una contraseña incorrecta para ver el mensaje genérico e iniciar sesión correctamente. Destacar la ruta protegida.
 3. **Búsqueda — 3 min.** Mostrar los 30 animales. Aplicar continente `África`, peligro activo y peso mínimo `100`: el resultado esperado es Elefante africano, Jirafa y León. Buscar luego un nombre inexistente y restablecer filtros. Explicar estados de carga/error y el contrato con la API.
-4. **Plus — 1–2 min.** Ordenar por peso en ambos sentidos. Exportar el subconjunto visible y abrir `animales-filtrados-AAAA-MM-DD.csv` para comprobar encabezados, orden y acentos.
+4. **Plus — 1–2 min.** Ordenar por peso en ambos sentidos. Exportar el subconjunto visible a CSV y a `animales-filtrados-AAAA-MM-DD.xlsx`; abrir el Excel para comprobar encabezados en la primera fila, orden, tipos numéricos y acentos.
 5. **Calidad y cierre — 1–2 min.** Mostrar `npm run check`, Actions y la matriz de casos. Cerrar sesión y resumir decisiones, límites y próximos pasos.
 
 ### Contingencias
@@ -175,7 +175,7 @@ Limitaciones deliberadas:
 - Sin red o GitHub no disponible: ejecutar `npm run check` y mostrar el workflow localmente.
 - Email ya registrado: cambiar el sufijo de fecha, por ejemplo `demo+AAAAMMDD-2@customswatch.test`.
 - Puerto ocupado: seguir la sección correspondiente de la [guía de instalación](docs/guia-instalacion.md#problemas-frecuentes).
-- Si la descarga del navegador está restringida: mostrar el test de CSV y su contenido esperado en la matriz.
+- Si la descarga del navegador está restringida: mostrar los tests de CSV/XLSX y su contenido esperado en la matriz.
 - Si un plus se retirara antes de entregar: eliminarlo tanto de este guion como del listado de funcionalidades.
 
 ## Estructura resumida

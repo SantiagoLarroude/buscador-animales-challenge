@@ -7,6 +7,7 @@ Este documento detalla el diseño de arquitectura y la guía paso a paso para im
 | Mejora | Estado | Evidencia |
 | --- | --- | --- |
 | Exportación CSV | Implementada | BOM UTF-8, encabezados en español, escape seguro y tests |
+| Exportación Excel `.xlsx` | Implementada | Encabezados en primera fila, tipos nativos, estilos, fila fija y tests |
 | Ordenamiento por columnas | Implementado | Cinco columnas, ambas direcciones y atributos accesibles |
 | Ficha/modal de detalle | Pendiente | Mejora futura fuera del alcance de cierre |
 | Búsqueda reactiva con debounce | Pendiente | Se conserva el envío explícito para una demo predecible |
@@ -47,7 +48,6 @@ export function exportToCsv(filename, rows) {
   const separator = ',';
   const keys = Object.keys(rows[0]);
   const csvContent =
-    'sep=,\n' +
     keys.join(separator) +
     '\n' +
     rows
@@ -73,6 +73,13 @@ export function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 ```
+
+### Segunda exportación: Excel `.xlsx`
+
+- `frontend/src/utils/animalExport.js` define una única fuente para encabezados, orden y transformación de valores compartida por CSV y Excel.
+- `frontend/src/utils/exportXlsx.js` genera un libro con la hoja `Animales`, encabezados en la primera fila, números como valores numéricos, anchos legibles y fila superior fija.
+- `write-excel-file/universal` se carga dinámicamente sólo al exportar, por lo que no aumenta el bundle inicial.
+- La interfaz conserva ambos formatos como acciones separadas y muestra un error accesible si la generación falla.
 
 ---
 
