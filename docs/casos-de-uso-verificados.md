@@ -17,6 +17,7 @@ Esta matriz registra resultados ejecutados sobre la versión indicada en cada fi
 | Suite final de interfaz | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `ed57f2c` | 29 backend + 25 frontend y build aprobados |
 | Auditoría post-interfaz | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `ed57f2c` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas; sin dependencias nuevas |
 | UAT visual de interfaz | 2026-09-26 | Chrome headless 153, Windows 11 x64 | Desktop 1382×904 y viewport 390×844 | Working tree sobre `ed57f2c` | Jerarquía de acciones, hover de logout, orden, chips y responsive aprobados |
+| Suite de navegación autenticada | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `4f50b9e` | 29 backend + 28 frontend y build aprobados |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -36,6 +37,7 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | AUTH-10 Token expirado | JWT firmado con expiración pasada | Consultar catálogo | `401`; UI limpia sesión y avisa | Tests backend/frontend; automática | Aprobado |
 | AUTH-11 Almacenamiento corrupto | `user` no es JSON válido | Abrir `/animales` | Elimina sesión y vuelve al login | Test frontend; automática | Aprobado |
 | AUTH-12 Logout | Sesión válida | Activar “Cerrar Sesión” | Elimina token/usuario y muestra login | Test frontend + UAT visual; mixta | Aprobado |
+| AUTH-13 Historial autenticado | Sesión activa o login exitoso | Abrir `/login` o `/signup`; volver atrás después de autenticar | Redirige al buscador y no vuelve a mostrar formularios de acceso mientras la sesión siga activa | `app.test.jsx`: rutas de visitante e historial reemplazado; automática | Aprobado |
 | CAT-01 Catálogo completo | JWT válido, sin query | Consultar `/api/animales` | 30 elementos | Test backend + UAT visual; mixta | Aprobado |
 | CAT-02 Nombre | `nombre=LEÓN` | Aplicar filtro | Coincidencia parcial sin distinguir casing | Test backend; automática | Aprobado |
 | CAT-03 Clase | `clase=Ave` | Aplicar filtro | Sólo clase Ave | Test backend; automática | Aprobado |
@@ -65,7 +67,7 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | UX-06 Estado de filtros | Catálogo inicial cargado | Editar, aplicar con éxito, provocar error y limpiar | Ambos botones parten deshabilitados; los cambios habilitan acciones; el éxito sincroniza; el error permite reintentar; limpiar consulta el catálogo | `app.test.jsx`; automática | Aprobado |
 | UX-07 Jerarquía visual | Catálogo cargado | Revisar logout, CSV, Excel, flechas y chips | Colores diferenciados, hover rojo, columna activa visible, indicadores comprensibles y tonos estables por categoría/valor | Tests de componentes/utilidad + UAT desktop/mobile; mixta | Aprobado |
 | QA-01 Instalación limpia | Servidores detenidos; lockfiles presentes | `npm run install:all` | Ambos `npm ci` completan | Registro de ejecución; manual/terminal | Aprobado |
-| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 25 frontend + Vite build | Salida de suite final; automática | Aprobado |
+| QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 28 frontend + Vite build | Salida de suite final; automática | Aprobado |
 | QA-03 Auditoría | Acceso a registry npm | `npm run audit` | Sin vulnerabilidades altas/críticas | 0 backend; 2 moderadas RR; automática | Aprobado con riesgo aceptado |
 | QA-04 CI Node 20/22 | Repositorio privado publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937); automática | Aprobado |
 

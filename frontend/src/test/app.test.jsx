@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import App from '../App.jsx';
 import { AuthProvider } from '../context/AuthContext.jsx';
 
@@ -58,6 +58,22 @@ function renderApp(route = '/') {
   );
 }
 
+function HistoryBackButton() {
+  const navigate = useNavigate();
+  return <button type="button" onClick={() => navigate(-1)}>Volver en historial</button>;
+}
+
+function renderAppWithHistory(initialEntries) {
+  return render(
+    <AuthProvider>
+      <MemoryRouter initialEntries={initialEntries}>
+        <App />
+        <HistoryBackButton />
+      </MemoryRouter>
+    </AuthProvider>
+  );
+}
+
 function storeSession() {
   localStorage.setItem('token', 'valid-token');
   localStorage.setItem('user', JSON.stringify({ id: 1, email: 'demo@customswatch.test' }));
@@ -75,6 +91,38 @@ describe('sesión y autenticación', () => {
     renderApp('/animales');
     expect(await screen.findByRole('heading', { name: /iniciar sesión/i })).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  test.each(['/login', '/signup'])(
+    'redirige %s al buscador cuando la sesión ya está activa',
+    async (route) => {
+      storeSession();
+      fetch.mockResolvedValue(response(animals));
+      renderApp(route);
+
+      expect(await screen.findByText('León')).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /iniciar sesión|crear cuenta/i })).not.toBeInTheDocument();
+    }
+  );
+
+  test('reemplaza el login en el historial después de autenticar', async () => {
+    fetch
+      .mockResolvedValueOnce(response({
+        token: 'valid-token',
+        user: { id: 1, email: 'demo@customswatch.test' },
+      }))
+      .mockResolvedValueOnce(response(animals));
+    const user = userEvent.setup();
+    renderAppWithHistory(['/login']);
+
+    await user.type(screen.getByLabelText(/correo electrónico/i), 'demo@customswatch.test');
+    await user.type(screen.getByLabelText(/contraseña/i), 'segura123');
+    await user.click(screen.getByRole('button', { name: /iniciar sesión/i }));
+    expect(await screen.findByText('León')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /volver en historial/i }));
+    expect(screen.getByText('León')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /iniciar sesión/i })).not.toBeInTheDocument();
   });
 
   test('descarta una sesión local corrupta', async () => {

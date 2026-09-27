@@ -5,7 +5,8 @@ Challenge fullstack de CustomsWatch para registrar usuarios, iniciar sesión y c
 ## Funcionalidades
 
 - Registro y login con contraseñas hasheadas y sesiones JWT de 2 horas.
-- Ruta del buscador protegida; cierre de sesión y recuperación ante tokens ausentes, inválidos o vencidos.
+- Ruta del buscador protegida; login/registro exclusivos para visitantes y recuperación ante tokens ausentes, inválidos o vencidos.
+- Historial coherente después de iniciar o cerrar sesión, sin volver a mostrar formularios de acceso durante una sesión activa.
 - Catálogo de 30 animales con filtros por nombre, clase, dieta, continente, rango de peso y peligro de extinción.
 - Estado de filtros explícito: aplicar sólo se habilita ante cambios pendientes y limpiar recupera inmediatamente el catálogo completo.
 - Validación consistente en frontend y API, incluidos rangos y booleanos estrictos.
@@ -95,7 +96,7 @@ Los archivos `.env` no se versionan. Los `.env.example` contienen sólo valores 
 | `npm run backend` | Inicia Express con recarga |
 | `npm run frontend` | Inicia Vite |
 | `npm run test:backend` | Ejecuta 29 tests de integración backend |
-| `npm run test:frontend` | Ejecuta 25 tests frontend |
+| `npm run test:frontend` | Ejecuta 28 tests frontend |
 | `npm test` | Ejecuta ambas suites |
 | `npm run build` | Genera el build de producción del frontend |
 | `npm run audit` | Falla ante vulnerabilidades altas o críticas |

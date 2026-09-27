@@ -31,7 +31,7 @@ export default function Login() {
       });
       if (response.token && response.user) {
         login(response.user, response.token);
-        navigate('/animales');
+        navigate('/animales', { replace: true });
       } else {
         setError('Respuesta inesperada del servidor');
       }
