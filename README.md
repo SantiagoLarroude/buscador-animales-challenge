@@ -19,7 +19,7 @@ Challenge fullstack de CustomsWatch para registrar usuarios, iniciar sesión y c
 ## Arquitectura
 
 ```text
-React 18 + React Router + Axios
+React 18 + React Router + Fetch API
           │ HTTP/JSON + Bearer JWT
           ▼
 Node.js + Express
@@ -34,7 +34,7 @@ La persistencia JSON respeta el alcance de la consigna y evita infraestructura e
 
 | Capa | Tecnología |
 | --- | --- |
-| Frontend | React 18, React Router 6.30.6, Axios, Vite 8, write-excel-file 4.1.1 |
+| Frontend | React 18, React Router 6.30.6, Fetch API, Vite 8, write-excel-file 4.1.1 |
 | Backend | Node.js, Express 4, JWT, bcryptjs, CORS, dotenv |
 | Calidad | Node Test Runner, Supertest, Vitest 5, Testing Library, jsdom |
 | CI | GitHub Actions, matriz Node 20.19 y 22 |
