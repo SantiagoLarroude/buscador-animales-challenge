@@ -150,7 +150,6 @@ Limitaciones deliberadas:
 
 - [Guía de instalación y troubleshooting](docs/guia-instalacion.md)
 - [Casos de uso verificados](docs/casos-de-uso-verificados.md)
-- [Consigna original](docs/consigna_Customswatch.md)
 - [Roadmap y mejoras futuras](docs/roadmap_mejoras.md)
 
 ## Demo en vivo (8–10 minutos)

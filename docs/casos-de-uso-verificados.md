@@ -6,21 +6,11 @@ Esta matriz registra resultados ejecutados sobre la versión indicada en cada fi
 
 | Ejecución | Fecha | Sistema | Versiones | Commit | Resultado |
 | --- | --- | --- | --- | --- | --- |
-| Instalación limpia | 2026-09-23 | Windows 11 x64 | Node 22.23.2; npm 11.16.0 | `9388bbe` (mismo lockfile) | `npm run install:all` completó tras cerrar Vite, que bloqueaba un binario nativo |
-| Suite final local | 2026-09-24 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | `9388bbe` | 29 backend + 14 frontend y build aprobados |
-| Auditoría | 2026-09-24 | Windows 11 x64 | npm audit | `9388bbe` | 0 backend; 2 moderadas frontend; 0 altas/críticas |
-| UAT visual | 2026-09-23 | Chrome, Windows 11 x64 | Desktop y viewport 390×844 | `9388bbe` (código de UI sin cambios desde UAT) | Flujo principal, orden, responsive y logout aprobados |
-| CI remoto | 2026-09-24 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `256018a` | [Run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937) aprobado |
-| Suite local CSV/XLSX | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `05da18a` | 29 backend + 20 frontend y build aprobados |
-| Auditoría post-XLSX | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `05da18a` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas |
-| UAT exportación XLSX | 2026-09-26 | Microsoft Excel, Windows 11 x64 | Versión de Excel no informada | Working tree sobre `05da18a` | El usuario confirmó que el archivo descargado abre y funciona correctamente |
-| Suite final de interfaz | 2026-09-26 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `ed57f2c` | 29 backend + 25 frontend y build aprobados |
-| Auditoría post-interfaz | 2026-09-26 | Windows 11 x64 | npm audit | Working tree sobre `ed57f2c` | 0 backend; 2 moderadas frontend ya documentadas; 0 altas/críticas; sin dependencias nuevas |
-| UAT visual de interfaz | 2026-09-26 | Chrome headless 153, Windows 11 x64 | Desktop 1382×904 y viewport 390×844 | Working tree sobre `ed57f2c` | Jerarquía de acciones, hover de logout, orden, chips y responsive aprobados |
-| Suite de navegación autenticada | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | Working tree sobre `4f50b9e` | 29 backend + 28 frontend y build aprobados |
 | Instalación limpia final | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0 | `f2075b0` | `npm run install:all` completó para backend y frontend con los lockfiles finales |
 | Suite final previa a entrega | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | `f2075b0` | 29 backend + 28 frontend y build aprobados después de la instalación limpia |
 | Auditoría final previa a entrega | 2026-09-27 | Windows 11 x64 | npm audit | `f2075b0` | 0 backend; 2 moderadas frontend documentadas; 0 altas/críticas |
+| UAT funcional y visual | 2026-09-26 | Chrome 153 y Microsoft Excel, Windows 11 x64 | Desktop y viewport 390×844 | `4f50b9e` | Flujo principal, responsive, orden, CSV y XLSX aprobados |
+| CI remoto de referencia | 2026-09-24 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `05da18a` | [Run 36003073308](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36003073308) aprobado |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -95,7 +85,7 @@ La exposición actual es baja: esta solución es CSR, no hidrata errores SSR y n
 - Logout usó rojo pastel y cambió a `rgb(220, 38, 38)` con texto blanco en hover; CSV y Excel quedaron diferenciados en violeta y verde pastel.
 - Los chips de clase, dieta y continente conservaron texto y bordes legibles, con tonos pastel determinísticos por valor.
 - Aplicar y limpiar comenzaron deshabilitados; editar habilitó las acciones, aplicar sincronizó el estado y limpiar recuperó el catálogo completo.
-- El archivo `.xlsx` descargado abrió y funcionó correctamente en Microsoft Excel según confirmación del usuario.
+- El archivo `.xlsx` descargado abrió y funcionó correctamente en Microsoft Excel.
 - A 390×844 los filtros quedaron apilados, las acciones de exportación ocuparon el ancho disponible y no hubo desborde horizontal de página; la tabla conservó su desplazamiento interno.
 - Logout eliminó la sesión y volvió a `/login`.
 

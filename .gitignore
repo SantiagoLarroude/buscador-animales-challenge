@@ -19,6 +19,9 @@ build/
 backend/database/users.json
 backend/database/*.tmp
 
+# Private delivery source material
+docs/consigna_Customswatch.md
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

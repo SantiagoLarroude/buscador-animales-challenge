@@ -19,6 +19,6 @@
     "npm": ">=10"
   },
   "keywords": ["challenge", "fullstack", "react", "express", "jwt", "customswatch"],
-  "author": "Santiago",
+  "author": "Santiago Larroude",
   "license": "MIT"
 }

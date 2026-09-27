@@ -4,7 +4,7 @@ Esta guía permite instalar, validar y ejecutar el Buscador de Animales en una m
 
 ## Entorno soportado y verificado
 
-| Elemento | Mínimo soportado | Verificado el 2026-09-23 |
+| Elemento | Mínimo soportado | Entorno verificado |
 | --- | --- | --- |
 | Node.js | `20.19.0` o `22.12.0` | `22.23.2` en Windows 11 x64 |
 | npm | `10` | `11.16.0` |
@@ -173,7 +173,7 @@ El archivo local `backend/database/users.json` se crea en runtime, está ignorad
 
 ### `npm ci` falla con `EPERM` en Windows
 
-Cerrá Vite, tests en modo watch y procesos Node de este repositorio; un binario nativo de Rollup/Rolldown puede quedar cargado. Identificá el PID exacto antes de detenerlo y repetí `npm run install:all`. El caso se reprodujo y resolvió durante la verificación del 2026-09-23.
+Cerrá Vite, tests en modo watch y procesos Node de este repositorio; un binario nativo de Rollup/Rolldown puede quedar cargado. Identificá el PID exacto antes de detenerlo y repetí `npm run install:all`.
 
 ### Dependencias inconsistentes o build extraño
 
