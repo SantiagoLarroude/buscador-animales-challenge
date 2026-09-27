@@ -6,11 +6,11 @@ Esta matriz registra resultados ejecutados sobre la versión indicada en cada fi
 
 | Ejecución | Fecha | Sistema | Versiones | Commit | Resultado |
 | --- | --- | --- | --- | --- | --- |
-| Instalación limpia final | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0 | `f2075b0` | `npm run install:all` completó para backend y frontend con los lockfiles finales |
-| Suite final previa a entrega | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | `f2075b0` | 29 backend + 28 frontend y build aprobados después de la instalación limpia |
-| Auditoría final previa a entrega | 2026-09-27 | Windows 11 x64 | npm audit | `f2075b0` | 0 backend; 2 moderadas frontend documentadas; 0 altas/críticas |
-| UAT funcional y visual | 2026-09-26 | Chrome 153 y Microsoft Excel, Windows 11 x64 | Desktop y viewport 390×844 | `4f50b9e` | Flujo principal, responsive, orden, CSV y XLSX aprobados |
-| CI remoto de referencia | 2026-09-24 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `05da18a` | [Run 36003073308](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36003073308) aprobado |
+| Instalación limpia final | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0 | `0d2af1b` | `npm run install:all` completó para backend y frontend con los lockfiles finales |
+| Suite final previa a entrega | 2026-09-27 | Windows 11 x64 | Node 22.23.2; npm 11.16.0; Vite 8.3.0; Vitest 5.0.1 | `0d2af1b` | 29 backend + 28 frontend y build aprobados después de la instalación limpia |
+| Auditoría final previa a entrega | 2026-09-27 | Windows 11 x64 | npm audit | `0d2af1b` | 0 backend; 2 moderadas frontend documentadas; 0 altas/críticas |
+| UAT funcional y visual | 2026-09-26 | Chrome 153 y Microsoft Excel, Windows 11 x64 | Desktop y viewport 390×844 | `0ecd1e2` | Flujo principal, responsive, orden, CSV y XLSX aprobados |
+| CI remoto final | 2026-09-27 | GitHub Actions Ubuntu | Node 20.19.0 y 22.x | `a1a74ae` | [Run 36319398563](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36319398563) aprobado |
 
 Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron secretos ni credenciales personales.
 
@@ -62,7 +62,7 @@ Las cuentas y bases usadas por tests/UAT fueron temporales. No se publicaron sec
 | QA-01 Instalación limpia | Servidores detenidos; lockfiles presentes | `npm run install:all` | Ambos `npm ci` completan | Registro de ejecución; manual/terminal | Aprobado |
 | QA-02 Tests y build | Dependencias limpias | `npm run check` | 29 backend + 28 frontend + Vite build | Salida de suite final; automática | Aprobado |
 | QA-03 Auditoría | Acceso a registry npm | `npm run audit` | Sin vulnerabilidades altas/críticas | 0 backend; 2 moderadas RR; automática | Aprobado con riesgo aceptado |
-| QA-04 CI Node 20/22 | Repositorio privado publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36002901937](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36002901937); automática | Aprobado |
+| QA-04 CI Node 20/22 | Repositorio publicado | Push a rama principal | Instalación, tests, build y audit verdes en ambas versiones | [GitHub Actions run 36319398563](https://github.com/SantiagoLarroude/buscador-animales-challenge/actions/runs/36319398563); automática | Aprobado |
 | QA-05 Datos runtime | Archivo local de usuarios existente | Verificar tracking e ignore de Git | `users.json` permanece local, se crea automáticamente y no puede agregarse por accidente | `git check-ignore` + hash local antes/después; terminal | Aprobado |
 
 ## Riesgo aceptado de dependencias
