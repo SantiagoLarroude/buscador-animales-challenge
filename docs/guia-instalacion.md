@@ -70,7 +70,7 @@ VITE_API_URL=http://localhost:3000/api
 Variables opcionales del backend:
 
 - `PORT`: cambia el puerto de Express; si lo modificás, actualizá también `VITE_API_URL`.
-- `DB_DIR`: ruta absoluta a un directorio que contenga `animals.json` y `users.json`. Los tests la usan para no tocar datos de desarrollo.
+- `DB_DIR`: ruta absoluta a un directorio que contenga `animals.json`. Si `users.json` no existe, el backend lo crea automáticamente. Los tests usan un directorio aislado para no tocar datos de desarrollo.
 
 ## 3. Iniciar la aplicación
 
@@ -169,7 +169,7 @@ La UI elimina la sesión local, redirige a `/login` y muestra un aviso. Iniciá 
 
 ### Email duplicado
 
-El archivo `backend/database/users.json` persiste registros entre reinicios. Usá otro email ficticio, por ejemplo `demo+AAAAMMDD-2@customswatch.test`. No edites ni borres el archivo mientras el servidor escribe.
+El archivo local `backend/database/users.json` se crea en runtime, está ignorado por Git y persiste registros entre reinicios. Usá otro email ficticio, por ejemplo `demo+AAAAMMDD-2@customswatch.test`. No edites ni borres el archivo mientras el servidor escribe.
 
 ### `npm ci` falla con `EPERM` en Windows
 
@@ -207,7 +207,7 @@ En Unix los comandos son idénticos. `--ff-only` evita crear un merge accidental
 
 ```text
 backend/
-  database/              catálogo y usuarios JSON
+  database/              catálogo versionado y usuarios JSON creados en runtime
   src/controllers/       autenticación y filtros
   src/middlewares/       validación JWT
   src/routes/            rutas Express

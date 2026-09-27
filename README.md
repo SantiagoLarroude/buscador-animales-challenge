@@ -28,7 +28,7 @@ Node.js + Express
 backend/database/*.json
 ```
 
-La persistencia JSON respeta el alcance de la consigna y evita infraestructura externa. `DB_DIR` permite aislar los datos de test. Las escrituras de usuarios se serializan y se reemplaza el archivo sólo después de completar la escritura temporal.
+La persistencia JSON respeta el alcance de la consigna y evita infraestructura externa. `animals.json` contiene el catálogo versionado; `users.json` se crea y actualiza localmente en runtime, por lo que está ignorado por Git. `DB_DIR` permite aislar los datos de test. Las escrituras de usuarios se serializan y se reemplaza el archivo sólo después de completar la escritura temporal.
 
 ## Stack y decisiones
 
@@ -111,7 +111,7 @@ Todas las respuestas, incluidos los errores controlados, usan JSON con `message`
 | `GET` | `/health` | — | `200` con `status: "OK"` |
 | `POST` | `/api/auth/signup` | `{ "email", "password" }` | `201`; `400` entrada inválida o duplicado |
 | `POST` | `/api/auth/login` | `{ "email", "password" }` | `200` con token y usuario; `401` genérico |
-| `GET` | `/api/animales` | filtros opcionales | `200` con array; `400` query inválida; `401/403` token |
+| `GET` | `/api/animales` | filtros opcionales | `200` con array; `400` query inválida; `401` token ausente, inválido o vencido |
 
 Filtros de `/api/animales`:
 
